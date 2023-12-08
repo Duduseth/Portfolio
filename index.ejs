@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chuveiro Inteligente</title>
+  <!-- Incluindo o Bootstrap (CSS e JS) -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="text-center mb-4">Controle de Chuveiro Inteligente</h2>
+
+    <!-- Formulário de Cadastro de Usuário -->
+    <form id="cadastroForm" action="/api/cadastrar-usuario" method="POST">
+      <div class="form-row">
+        <!--
+        <div class="col-md-4 mb-3">
+          <label for="id">ID do Usuário</label>
+          <input type="text" class="form-control" id="id" required>
+        </div>
+        -->
+        <div class="col-md-4 mb-3">
+          <label for="nome">Nome do Usuário</label>
+          <input type="text" class="form-control" id="nome" name="nome" required>
+        </div>
+        <div class="col-md-2 mb-3">
+          <label for="banhos">Banhos por Dia</label>
+          <input type="number" class="form-control" id="banhos" name="banhos" required>
+        </div>
+        <div class="col-md-2 mb-3">
+          <label for="minutos">Minutos por Banho</label>
+          <input type="number" class="form-control" id="minutos" name="minutos" required>
+        </div>
+      </div>
+
+      <!-- <button class="btn btn-primary" type="button" onclick="adicionarUsuario()">Adicionar Usuário</button> -->
+      <input type="submit" value="Adicionar Usuário" class="btn btn-primary">
+    </form>
+
+    <!-- Tabela de Usuários -->
+    <table class="table mt-4">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Banhos por Dia</th>
+          <th>Minutos por Banho</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaUsuarios">
+        <!-- Conteúdo da tabela será adicionado dinamicamente com JavaScript -->
+        <% if(!registros || registros.length == 0) { %>
+          <tr>
+            <td colspan="4">Nenhum evento cadastrado.</td>
+          </tr>
+          <% } else { 
+            registros.forEach(function(evento){ %>
+              <tr>
+                <td style="width:25%"><%= evento.id %></td>
+                <td style="width:25%"><%= evento.nome %></td>
+                <td style="width:25%"><%= evento.banhos %></td>
+                <td style="width:25%"><%= evento.minutos %></td>
+                <td><a href="/apagar/<%= evento.id %>" onclick="return confirm('Confirma exclusão?');">Excluir</a></td>
+              </tr>
+          <% }) }%>
+      </tbody>
+    </table>
+    <a href="/sair"><button class="btn btn-primary" type="button">Logoff</button></a>
+  </div>
+
+
+  
+
+
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    function adicionarUsuario() {
+      var id = document.getElementById("id").value;
+      var nome = document.getElementById("nome").value;
+      var banhos = document.getElementById("banhos").value;
+      var minutos = document.getElementById("minutos").value;
+
+      // Adiciona o usuário à tabela no frontend
+      var tabelaUsuarios = document.getElementById("tabelaUsuarios");
+      var newRow = tabelaUsuarios.insertRow(tabelaUsuarios.rows.length);
+      newRow.innerHTML = "<td>" + id + "</td><td>" + nome + "</td><td>" + banhos + "</td><td>" + minutos + "</td><td><button class='btn btn-danger btn-sm' onclick='excluirUsuario(this)'>Excluir</button></td>";
+
+      // Limpa os campos do formulário após adicionar o usuário
+      document.getElementById("id").value = "";
+      document.getElementById("nome").value = "";
+      document.getElementById("banhos").value = "";
+      document.getElementById("minutos").value = "";
+
+      // Envia os dados do usuário para o servidor Express
+      enviarDadosParaServidor(id, nome, banhos, minutos);
+    }
+
+    function excluirUsuario(button) {
+      var row = button.parentNode.parentNode;
+      row.parentNode.removeChild(row);
+    }
+
+    function enviarDadosParaServidor(id, nome, banhos, minutos) {
+      // Envia os dados para o servidor Express usando AJAX
+      $.ajax({
+        type: "POST",
+        url: "http://localhost:3000/api/cadastrar-usuario", // Rota corrigida
+        data: {
+          userId: id,
+          userName: nome,
+          bathsPerDay: banhos,
+          minutesPerBath: minutos
+        },
+        success: function (response) {
+          console.log("Dados enviados com sucesso para o servidor Express");
+        },
+        error: function (error) {
+          console.error("Erro ao enviar dados para o servidor Express", error);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+
